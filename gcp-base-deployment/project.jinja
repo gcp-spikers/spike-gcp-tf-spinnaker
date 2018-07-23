@@ -1,0 +1,33 @@
+resources:
+  - name: get-iam-policy
+    action: gcp-types/cloudresourcemanager-v1:cloudresourcemanager.projects.getIamPolicy
+    properties:
+      resource: spike-gcp-tf-spinnaker
+  - name: add-iam-policy
+    action: gcp-types/cloudresourcemanager-v1:cloudresourcemanager.projects.setIamPolicy
+    properties:
+      resource: spike-gcp-tf-spinnaker
+      policy: $(ref.get-iam-policy)
+      gcpIamPolicyPatch:
+        add:
+        - role: roles/iam.serviceAccountUser
+          members:
+          - serviceAccount:$(ref.terraform-service-account.email)
+        - role: roles/compute.instanceAdmin
+          members:
+          - serviceAccount:$(ref.terraform-service-account.email)
+        - role: roles/compute.networkAdmin
+          members:
+          - serviceAccount:$(ref.terraform-service-account.email)
+        - role: roles/storage.admin
+          members:
+          - serviceAccount:$(ref.terraform-service-account.email)
+        - role: roles/compute.securityAdmin
+          members:
+          - serviceAccount:$(ref.terraform-service-account.email)
+        - role: roles/iam.serviceAccountAdmin
+          members:
+          - serviceAccount:$(ref.terraform-service-account.email)
+        - role: roles/resourcemanager.projectIamAdmin
+          members:
+          - serviceAccount:$(ref.terraform-service-account.email)

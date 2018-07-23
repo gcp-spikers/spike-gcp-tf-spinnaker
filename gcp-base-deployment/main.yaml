@@ -1,0 +1,24 @@
+imports:
+- path: service_account.jinja
+- path: storage_bucket.jinja
+- path: storage_bucket_acl.jinja
+- path: project.jinja
+
+resources:
+- name: policy-binding
+  type: project.jinja
+- name: &SA_NAME terraform-service-account
+  type: service_account.jinja
+- name: spinnaker-spike-bucket
+  type: storage_bucket.jinja
+  properties:
+    serviceAccountId: *SA_NAME
+    location: australia-southeast1
+    storageClass: REGIONAL
+- name: storage-bucket-acl
+  type: storage_bucket_acl.jinja
+  properties:
+    bucket: $(ref.spinnaker-spike-bucket.name)
+    email: $(ref.terraform-service-account.email)
+    entity: user-$(ref.terraform-service-account.email)
+    role: OWNER
