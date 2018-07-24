@@ -1,3 +1,5 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'asia.gcr.io/$PROJECT_ID/k8s-helm-for-spinnaker/', './modules/service-machine']
+  args: ['build', '-t', 'asia.gcr.io/$PROJECT_ID/k8s-helm-for-spinnaker', '.']
+  dir: 'modules/service-machine'
+images: ['asia.gcr.io/$PROJECT_ID/k8s-helm-for-spinnaker']
