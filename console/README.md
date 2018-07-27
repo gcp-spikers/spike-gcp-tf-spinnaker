@@ -14,6 +14,6 @@ There's a high chance we'll bang against some limitations (eg. the `gcloud auth`
 
 1. Open up a shell in the container
 
-        docker run --publish-all --entrypoint "bash" \
+        docker run --publish 8080:8080 --entrypoint "bash" \
         --mount type=bind,source="$(pwd)",target=/app,readonly \
         -it engacc/cloud-dev:latest

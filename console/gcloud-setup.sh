@@ -45,12 +45,9 @@ export SA_EMAIL=$(gcloud iam service-accounts list \
     --format='value(email)')
 export PROJECT=$(gcloud info --format='value(config.project)')
 
-
-
 # 'storage.admin' role binding for service account
 gcloud projects add-iam-policy-binding \
     $PROJECT --role roles/storage.admin --member serviceAccount:$SA_EMAIL
-
 
 # Download service account credentials key
 gcloud iam service-accounts keys create spinnaker-sa.json --iam-account $SA_EMAIL
@@ -112,7 +109,7 @@ EOF
 ###### DEPLOY SPINNAKER ######
 
 # Install helm chart with spinnaker-config.yaml
-helm install -n cd stable/spinnaker -f spinnaker-config.yaml --timeout 600 \
+helm install --wait -n cd stable/spinnaker -f spinnaker-config.yaml --timeout 600 \
     --version 0.3.1
 
 # Initiate port forwarding to access Spinnaker UI
