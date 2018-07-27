@@ -1,18 +1,39 @@
 #!/usr/bin/env sh
 
+set -x
+
 # Have the following APIs enabled
 # Kubernetes Engine, Container Builder, and Resource Manager 
 
-###### BASE INFRA ######
+###### Authentication ######
+#
+# Manually reproducing the steps which `gcloud init` follows
+#
+
+# Select configuration
+# (NOT NEEDED)
+# gcloud config configurations create spinnaker-tutorial || \
+#     gcloud config configurations activate spinnaker-tutorial
+
+# Setup credentials
+gcloud auth activate-service-account --key-file=$GCLOUD_KEYFILE
+
+# Set Project
+gcloud config set project $GCLOUD_PROJECT
 
 # Set default zone
 export ZONE="australia-southeast1-a"
 export REGION="australia-southeast1"
 gcloud config set compute/zone $ZONE
 
+# Set default region
+gcloud config set compute/region $REGION
+
+###### BASE INFRA ######
+
 # Create cluster
 gcloud container clusters create spinnaker-tutorial \
---machine-type=n1-standard-2
+    --machine-type=n1-standard-2
 
 # Create spinnaker service account for storage access
 gcloud iam service-accounts create  spinnaker-storage-account \
@@ -37,11 +58,11 @@ gcloud iam service-accounts keys create spinnaker-sa.json --iam-account $SA_EMAI
 ###### INSTALL HELM ######
 
 # Download helm binary
-wget https://storage.googleapis.com/kubernetes-helm/helm-v2.7.2-linux-amd64.tar.gz
+#wget https://storage.googleapis.com/kubernetes-helm/helm-v2.7.2-linux-amd64.tar.gz
 
 # Unzip and cp
-tar zxfv helm-v2.7.2-linux-amd64.tar.gz
-cp linux-amd64/helm .
+#tar zxfv helm-v2.7.2-linux-amd64.tar.gz
+#cp linux-amd64/helm .
 
 # Give 'Tiller' cluster-admin role in cluster
 
@@ -53,13 +74,13 @@ kubectl create clusterrolebinding tiller-admin-binding --clusterrole=cluster-adm
 kubectl create clusterrolebinding --clusterrole=cluster-admin --serviceaccount=default:default spinnaker-admin
 
 # Initialize helm to install Tiller in cluster
-./helm init --service-account=tiller
-./helm update
+helm init --wait --service-account=tiller
+helm repo update
 
 ###### SPINNAKER CONFIG ######
 
 # Create bucket for Spinnaker pipeline config
-BUCKET=$PROJECT-spinnaker-config
+export BUCKET=$PROJECT-spinnaker-config
 gsutil mb -c regional -l $REGION gs://$BUCKET
 
 export SA_JSON=$(cat spinnaker-sa.json)
@@ -91,7 +112,7 @@ EOF
 ###### DEPLOY SPINNAKER ######
 
 # Install helm chart with spinnaker-config.yaml
-./helm install -n cd stable/spinnaker -f spinnaker-config.yaml --timeout 600 \
+helm install -n cd stable/spinnaker -f spinnaker-config.yaml --timeout 600 \
     --version 0.3.1
 
 # Initiate port forwarding to access Spinnaker UI
