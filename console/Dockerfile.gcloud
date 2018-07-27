@@ -40,9 +40,10 @@ RUN set -x \
     && rm /var/cache/apk/* \
     && rm -f /helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz \
     #
-    && kubectl version --client \
-    && terraform --version \
-    && gcloud --version
+    # && kubectl version --client \
+    # && terraform --version \
+    # && gcloud --version
+    && echo "-- dependencies process complete"
 
 USER kubectl
 ENTRYPOINT ["/bin/bash"]
