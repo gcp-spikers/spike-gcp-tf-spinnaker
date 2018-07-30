@@ -1,9 +1,9 @@
 variable "remote-state" {
-  default = "spinnaker-spike-bucket"
+  default = "terraform-bucket-on-mountain"
 }
 
 variable "project" {
-  default = "spike-gcp-tf-spinnaker"
+  default = "terraform-on-a-mountain"
 }
 
 variable "region" {

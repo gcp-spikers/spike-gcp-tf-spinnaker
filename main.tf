@@ -7,7 +7,7 @@ terraform {
   backend "gcs" {
     credentials = "account.json"
     region      = "australia-southeast1"
-    bucket      = "spinnaker-spike-bucket"
+    bucket      = "terraform-bucket-on-mountain"
   }
 }
 
@@ -24,5 +24,10 @@ terraform {
 
 module "kube-cluster" {
   source  = "modules/kube-cluster"
+  project = "${var.project}"
+}
+
+module "spinnaker-service-account" {
+  source  = "modules/spinnaker-service-account"
   project = "${var.project}"
 }
