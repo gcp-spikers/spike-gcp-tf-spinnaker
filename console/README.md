@@ -6,8 +6,20 @@ Due to the disparate setup rituals required, the aim is to have all development 
 
 ~There's a high chance we'll bang against some limitations (eg. the `gcloud auth` command tries to launch a browser)~ (resolved without issue)
 
+### Authentication
+
+Currently the only prerequisite is to have a (generated) GCP account key .json file in the repository root.
+
+The docker image expects the environment variable `GCLOUD_KEYFILE` to match this filename, but will default to `account.json`
+
+See [this article](https://cloud.google.com/video-intelligence/docs/common/auth) for how to generate this. 
+
+>*WARNING: If you don't use the default filename, ensure you include it in gitignore - if you accidentally push credentials the _must be immediately deleted and revoked_*
+
 ### Docker-based (experimental)
 
+1. Set the `GCLOUD_PROJECT` environment variable to your GCP Project's name
+        `export GCLOUD_PROJECT=[YOUR PROJECT ID]`
 1. Build the image 
 
         docker build -f console/Dockerfile.gcloud -t engacc/cloud-dev:latest .
