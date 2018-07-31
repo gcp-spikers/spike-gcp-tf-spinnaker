@@ -59,8 +59,6 @@ COPY --chown=kubectl:kubectl $GCLOUD_KEYFILE /config/account.json
 COPY --chown=kubectl:kubectl console/gcloud-setup.sh /config
 COPY --chown=kubectl:kubectl console/gcloud-shutdown.sh /config
 
-# Setup auth et al
-# RUN ~/gcloud-setup.sh
-
+WORKDIR $HOME
 USER $USER
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["bash"]
