@@ -1,0 +1,64 @@
+# Use google's base cloud-sdk image
+FROM google/cloud-sdk:alpine as dependencies
+
+LABEL maintainer="Keilin Olsen <keilin.olsen@heathwallace.com>"
+
+# Slow-changing env vars
+ENV \
+  # Some tools store configuration in home dir, so place that elsewhere
+  HOME="/config" \
+  USER="kubectl"   
+
+# Slow-changing setup
+RUN set -x \
+    && apk add --update sudo \
+    # Create a non-root user
+    && adduser $USER -Du 2342 -h ~ \
+    # Give new user ownership of their home
+    && chown -R $USER:$USER ~ \
+    #
+    && gcloud components install kubectl \
+    && chown -R $USER:$USER /config/.config \
+    #
+    # FIXME: THIS IS DEV-TEMPORARY
+    #
+    && echo "$USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+# Volatile env vars
+ENV \
+  #KUBE_LATEST_VERSION="v1.11.1" \
+  HELM_LATEST_VERSION="v2.9.1" \
+  GCLOUD_PROJECT="${PROJECT:-spike-gcp-tf-spinnaker}" \
+  GCLOUD_KEYFILE="${KEYFILE:-account.json}"
+
+# Install external dependencies
+RUN set -x \
+    #
+    && apk add --update ca-certificates \
+    && apk add --update -t deps curl \    
+    && apk add --update terraform \
+    #
+    #&& chmod +x /usr/local/bin/kubectl \    
+    && chown -R kubectl:kubectl /config \
+    && ls -al /config \    
+    #
+    && wget https://storage.googleapis.com/kubernetes-helm/helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz \
+    && tar -xvf helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz \
+    && mv linux-amd64/helm /usr/local/bin \
+    && apk del --purge deps \
+    && rm /var/cache/apk/* \
+    && rm -f /helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz \
+    #
+    # && kubectl version --client \
+    # && terraform --version \
+    # && gcloud --version
+    && echo "-- dependencies process complete"
+
+# FROM dependencies as setup
+COPY --chown=kubectl:kubectl $GCLOUD_KEYFILE /config/account.json
+COPY --chown=kubectl:kubectl console/gcloud-setup.sh /config
+COPY --chown=kubectl:kubectl console/gcloud-shutdown.sh /config
+
+WORKDIR $HOME
+USER $USER
+ENTRYPOINT ["bash"]

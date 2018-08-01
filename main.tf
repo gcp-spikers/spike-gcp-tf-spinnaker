@@ -11,13 +11,18 @@ terraform {
   }
 }
 
-module "service-machine" {
-  source = "modules/service-machine"
-  project = "${var.project}"
-  network-uri = "${module.network.network-uri}"
-}
+# module "service-machine" {
+#   source = "modules/service-machine"
+#   project = "${var.project}"
+#   network-uri = "${module.network.network-uri}"
+# }
 
-module "network" {
-  source = "modules/network"
+# module "network" {
+#   source = "modules/network"
+#   project = "${var.project}"
+# }
+
+module "kube-cluster" {
+  source  = "modules/kube-cluster"
   project = "${var.project}"
 }
