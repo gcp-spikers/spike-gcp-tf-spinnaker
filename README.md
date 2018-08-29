@@ -1,5 +1,8 @@
 # spike-gcp-tf-spinnaker
-Terraforming Spinnaker on GCP
+
+## ⚠ This repository documented a spike of installation process, and has been superceded by a pure Terraform solution [here](https://github.com/gcp-spikers/gke-terraform-helm-spinnaker)
+
+Spike for provisioning Spinnaker on GCP
 
 - `/modules`
   - collection of terraform modules for building the infrastructure
